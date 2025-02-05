@@ -1,0 +1,22 @@
+AIPriceIndex/
+├── backend/
+│   ├── src/
+│   │   ├── controllers/
+│   │   ├── models/
+│   │   ├── services/
+│   │   └── routes/
+│   ├── tests/
+│   ├── .env.example
+│   └── package.json
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   └── utils/
+│   ├── public/
+│   └── package.json
+├── docker/
+│   ├── backend.Dockerfile
+│   └── frontend.Dockerfile
+├── docker-compose.yml
+└── README.md 

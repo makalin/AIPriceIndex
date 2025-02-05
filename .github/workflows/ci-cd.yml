@@ -1,0 +1,68 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: aipriceindex_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18'
+
+    - name: Install Dependencies
+      run: |
+        cd backend && npm install
+        cd ../frontend && npm install
+
+    - name: Run Backend Tests
+      run: cd backend && npm test
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/aipriceindex_test
+        NODE_ENV: test
+
+    - name: Run Frontend Tests
+      run: cd frontend && npm test
+
+    - name: Build
+      run: |
+        cd backend && npm run build
+        cd ../frontend && npm run build
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Deploy to Production
+      env:
+        DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+      run: |
+        # Add deployment steps here
+        # This could be deploying to Vercel, DigitalOcean, etc. 
